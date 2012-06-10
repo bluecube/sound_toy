@@ -91,4 +91,14 @@ class Linear(tracks.BaseTrack):
 
         return _lin_iterator(a, b, length)
         
+class Box(tracks.BaseTrack):
+    def __init__(self, length, value = 1):
+        super().__init__()
+        self._length = length
+        self._value = value
 
+    def __iter__(self):
+        self.check_samplerate()
+
+        return itertools.repeat(self._value,
+            int(float(self._length) * self._samplerate))
