@@ -1,6 +1,7 @@
 import operator
 import math
 import itertools
+import numpy
 
 class BaseTrack:
     """
@@ -9,6 +10,15 @@ class BaseTrack:
     def __init__(self, *slaves):
         self._samplerate = None
         self._slaves = list(slaves)
+
+    def as_array(self):
+        """
+        Return numpy array of this track's data
+        For infinite tracks this just hangs!
+        This is only for reading and for most tracks it's
+        generated from the iterator.
+        """
+        return numpy.fromiter(iter(self), numpy.float)
 
     def add_slave(self, track):
         """
@@ -155,13 +165,16 @@ class Repeat(BaseTrack):
 
 class SampledData(BaseTrack):
     """
-    Track that wraps array of pre-sampled data.
+    Track that wraps array of pre-sampled numpy data.
     """
 
     def __init__(self, data, samplerate):
         super().__init__()
         self._data = data
         self.set_samplerate(samplerate)
+
+    def as_array(self):
+        return self._data
 
     def __iter__(self):
         return iter(self._data)
