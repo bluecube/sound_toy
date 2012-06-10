@@ -2,11 +2,6 @@ from .tracks import BaseTrack
 import itertools
 import math
 
-class _Negate:
-    def __init__(self, track):
-        self.track = track
-
-
 class Oscillator(BaseTrack):
     def __init__(self, freq, amplitude = 1, amplitudeLow = None, amplitudeHigh = None, phase = 0):
         super().__init__()
