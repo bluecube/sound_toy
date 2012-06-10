@@ -33,17 +33,27 @@ class ADSR(tracks.BaseTrack):
         if len(lengths) != 4:
             raise Exception('lengths must be 4 items long.')
 
-        values = [
+        self._values = [
             (noisefloor, top_volume),
             (top_volume, sustain_volume),
             (sustain_volume, sustain_volume),
             (sustain_volume, noisefloor)
             ]
+        self._lengths = lengths
 
-        lengths_s = (int(l * samplerate) for l in lengths)
+    def __iter__(self):
+        lengths_s = (int(l * self._samplerate) for l in self._lengths)
 
-        self._values = [((b - a) / l, a, l)
-            for ((a, b), l) in zip(values, lengths_s) if l != 0]
+        return itertools.chain.from_iterable(
+            itertools.starmap(
+                _lin_iterator,
+                (
+                    ((b - a) / l, a, l) for
+                    ((a, b), l) in
+                    zip(self._values, lengths_s)
+                )
+            ))
+
 
     def __iter__(self):
         return itertools.chain.from_iterable(
