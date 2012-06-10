@@ -1,4 +1,5 @@
 import itertools
+import math
 
 from . import tracks
 
@@ -24,7 +25,7 @@ def _exp_iterator(n0, l, count):
     else:
         it = iter(range(count))
 
-    return (n0 * e**(x * l) for x in it)
+    return (n0 * math.exp(x * l) for x in it)
 
 class ADSR(tracks.BaseTrack):
     def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1, noisefloor = 0.001):
@@ -55,13 +56,20 @@ class ADSR(tracks.BaseTrack):
             ))
 
 
+class Exponential(tracks.BaseTrack):
+    def __init__(self, start_val, stop_val, length):
+        super().__init__()
+        self._length = length
+        self._start_val = start_val
+        self._stop_val = stop_val
+
     def __iter__(self):
-        return itertools.chain.from_iterable(
-            itertools.starmap(_lin_iterator, self._values))
+        length = int(float(self._length) * self._samplerate)
+        n0 = float(self._start_val)
+        l = math.log(self._stop_val / n0) / length
 
+        return _exp_iterator(n0, l, length)
 
-#class Exponential(tracks.BaseTrack):
-#    pass
 
 class Linear(tracks.BaseTrack):
     def __init__(self, start_val, stop_val, length):
