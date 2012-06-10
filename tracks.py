@@ -46,7 +46,7 @@ class BaseTrack:
             raise Exception("Sample rate not set!")
 
         for track in self._slaves:
-            track.set_samplerate(samplerate)
+            track.set_samplerate(self._samplerate)
 
     def __iter__(self):
         raise NotImplemented()
