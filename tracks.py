@@ -6,8 +6,7 @@ import pdb
 
 class BaseTrack:
     """
-    A track corresponds to any data that repeats every sample --
-    sound, frequency, volume, ...
+    A track represents any that can be sampled -- sound, frequency, volume, ...
     """
     def __init__(self, *slaves):
         self._samplerate = None
