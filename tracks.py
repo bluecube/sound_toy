@@ -26,6 +26,9 @@ class BaseTrack:
         self._samplerate = samplerate
         for track in self._slaves:
             track.set_samplerate(samplerate)
+    
+    def get_samplerate(self):
+        return self._samplerate
 
     def check_samplerate():
         if self._samplerate is None:
