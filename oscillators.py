@@ -1,4 +1,4 @@
-from tracks import BaseTrack
+from .tracks import BaseTrack
 import itertools
 import math
 

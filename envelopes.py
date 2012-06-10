@@ -1,6 +1,6 @@
 import itertools
 
-import tracks
+from . import tracks
 
 def _lin_iterator(a, b, count = None):
     """
