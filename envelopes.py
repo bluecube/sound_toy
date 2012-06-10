@@ -72,12 +72,8 @@ class Linear(tracks.BaseTrack):
 
     def __iter__(self):
         length = int(float(self._length) * self._samplerate)
-        print(length)
         b = float(self._start_val)
         a = (float(self._stop_val) - b) / length
-
-        print(self._start_val)
-        print(self._stop_val)
 
         return _lin_iterator(a, b, length)
         
