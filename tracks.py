@@ -2,8 +2,6 @@ import operator
 import math
 import itertools
 
-import pdb
-
 class BaseTrack:
     """
     A track represents any that can be sampled -- sound, frequency, volume, ...
