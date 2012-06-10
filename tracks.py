@@ -12,7 +12,6 @@ class BaseTrack:
     def __init__(self, *slaves):
         self._samplerate = None
         self._slaves = list(slaves)
-        self._mixer = None
 
     def add_slave(self, track):
         self._slaves.append(track)
@@ -27,14 +26,6 @@ class BaseTrack:
         self._samplerate = samplerate
         for track in self._slaves:
             track.set_samplerate(samplerate)
-
-    def set_mixer(mixer):
-        if self._mixer is not None:
-            return
-
-        self._mixer = samplerate
-        for track in self._slaves:
-            track.set_mixer(samplerate)
 
     def check_samplerate():
         if self._samplerate is None:
