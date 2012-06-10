@@ -7,27 +7,22 @@ class Oscillator(BaseTrack):
         super().__init__()
 
         self._freq = freq
-        if isinstance(freq, BaseTrack):
-            self.add_slave(freq)
+        self.add_slave(freq)
 
         self._phase = phase
-        if isinstance(phase, BaseTrack):
-            self.add_slave(phase)
+        self.add_slave(phase)
 
         if amplitudeLow is None and amplitudeHigh is None:
             self._amplitude = amplitude
             self._amplitudeHigh = None
             self._amplitudeLow = None
-            if isinstance(amplitude, BaseTrack):
-                self.add_slave(amplitude)
+            self.add_slave(amplitude)
         elif amplitudeLow is not None and amplitudeHigh is not None:
             self._amplitude = None
             self._amplitudeHigh = amplitudeHigh
             self._amplitudeLow = amplitudeLow
-            if isinstance(amplitudeLow, BaseTrack):
-                self.add_slave(amplitudeLow)
-            if isinstance(amplitudeHigh, BaseTrack):
-                self.add_slave(amplitudeHigh)
+            self.add_slave(amplitudeLow)
+            self.add_slave(amplitudeHigh)
         else:
            raise Exception("Both amplitudeLow and amplitudeHigh must be either None or not None")
 
@@ -61,6 +56,8 @@ class Oscillator(BaseTrack):
         return not hasattr(x, '__next__')
 
     def __iter__(self):
+        self.check_samplerate()
+
         freq = self._convert(self._freq)
         phase = self._convert(self._phase)
         amplitude = self._convert(self._amplitude)

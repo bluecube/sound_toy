@@ -14,7 +14,13 @@ class BaseTrack:
         self._slaves = list(slaves)
 
     def add_slave(self, track):
-        self._slaves.append(track)
+        """
+        Add a track as a slave.
+        Slave hierarchy is used to distribute the information about samplerate.
+        If track is not a BaseTrack subclass, then this method does nothing.
+        """
+        if isinstance(track, BaseTrack):
+            self._slaves.append(track)
     
     def set_samplerate(self, samplerate):
         if self._samplerate is not None:
@@ -30,9 +36,17 @@ class BaseTrack:
     def get_samplerate(self):
         return self._samplerate
 
-    def check_samplerate():
+    def check_samplerate(self):
+        """
+        Check that samperate was set for this track and all its slaves.
+        To be called in __iter__ methods of subclasses.
+        """
+
         if self._samplerate is None:
             raise Exception("Sample rate not set!")
+
+        for track in self._slaves:
+            track.set_samplerate(samplerate)
 
     def __iter__(self):
         raise NotImplemented()
@@ -43,6 +57,7 @@ class Mixer(BaseTrack):
         add_slave(track)
 
     def __iter__(self):
+        self.check_samplerate()
         return map(math.fsum,
             itertools.zip_longest(
                 *self._slaves,
@@ -54,6 +69,7 @@ class Chain(BaseTrack):
         add_slave(track)
 
     def __iter__(self):
+        self.check_samplerate()
         return itertools.chain.from_iterable(self._slaves)
 
 
@@ -84,6 +100,8 @@ class Repeat(BaseTrack):
             rhythm.measure_len() * repeat, sound)
         
     def __iter__(self):
+        self.check_samplerate()
+
         for i in range(self._start):
             yield 0
 
