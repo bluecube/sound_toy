@@ -20,7 +20,7 @@ class BaseTrack:
     def set_samplerate(self, samplerate):
         if self._samplerate is not None:
             if self._samplerate != samplerate:
-                raise Exception("Sample rate already set to wrong value!")
+                raise Exception("Sample rate already set to different value!")
             else:
                 return
 
