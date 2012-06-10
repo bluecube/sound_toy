@@ -136,3 +136,17 @@ class Repeat(BaseTrack):
             playing = newplaying
 
             yield ret
+
+
+class SampledData(BaseTrack):
+    """
+    Track that wraps array of pre-sampled data.
+    """
+
+    def __init__(self, data, samplerate):
+        super().__init__()
+        self._data = data
+        self.set_samplerate(samplerate)
+
+    def __iter__(self):
+        return iter(self._data)
