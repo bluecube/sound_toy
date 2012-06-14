@@ -20,6 +20,25 @@ class BaseTrack:
         """
         return numpy.fromiter(iter(self), numpy.float)
 
+    def as_arrays_iter(self, size, fill = 0):
+        """
+        Return iterator that gives numpy arrays of length size containing
+        the track's data.
+        The last array is filled with fill.
+        If fill is None, then the last array is shorter.
+        """
+        it = iter(self)
+
+        while True:
+            lst = list(itertools.islice(it, size))
+
+            if not len(lst):
+                return
+            elif len(lst) < size and fill is not None:
+                lst.extend((size - len(lst)) * [fill])
+
+            yield numpy.array(lst)
+
     def add_slave(self, track):
         """
         Add a track as a slave.
