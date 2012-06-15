@@ -30,14 +30,18 @@ class BaseTrack:
         it = iter(self)
 
         while True:
-            lst = list(itertools.islice(it, size))
+            arr = numpy.fromiter(itertools.islice(it, size), dtype=numpy.float)
 
-            if not len(lst):
+            if not len(arr):
                 return
-            elif len(lst) < size and fill is not None:
-                lst.extend((size - len(lst)) * [fill])
-
-            yield numpy.array(lst)
+            elif len(arr) < size and fill is not None:
+                yield numpy.append(
+                    arr,
+                    numpy.fromiter(
+                        itertools.repeat(fill, size - len(arr)),
+                        dtype=numpy.float))
+            else:
+                yield numpy.array(arr)
 
     def add_slave(self, track):
         """
