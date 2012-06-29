@@ -78,6 +78,13 @@ class BaseTrack:
         for track in self._slaves:
             track.set_samplerate(self._samplerate)
 
+    def __len__(self):
+        """
+        Return the length of this track in samples or
+        or None if the track is infinite.
+        """
+        raise NotImplemented()
+
     def __iter__(self):
         raise NotImplemented()
 
@@ -198,6 +205,9 @@ class SampledData(BaseTrack):
 
     def as_array(self):
         return self._data
+
+    def __len__(self):
+        return len(self._data)
 
     def __iter__(self):
         return iter(self._data)

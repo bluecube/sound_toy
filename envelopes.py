@@ -42,6 +42,10 @@ class ADSR(tracks.BaseTrack):
             ]
         self._lengths = lengths
 
+    def __len__(self):
+        check_samplerate()
+        return sum((int(l * self._samplerate) for l in self._lengths))
+
     def __iter__(self):
         self.check_samplerate()
 
@@ -65,11 +69,15 @@ class Exponential(tracks.BaseTrack):
         self._start_val = start_val
         self._stop_val = stop_val
 
+    def __len__(self):
+        check_samplerate()
+        return int(self._length * self._samplerate)
+
     def __iter__(self):
         self.check_samplerate()
 
-        length = int(float(self._length) * self._samplerate)
-        n0 = float(self._start_val)
+        length = int(self._length * self._samplerate)
+        n0 = self._start_val
         l = math.log(self._stop_val / n0) / length
 
         return _exp_iterator(n0, l, length)
@@ -81,6 +89,10 @@ class Linear(tracks.BaseTrack):
         self._length = length
         self._start_val = start_val
         self._stop_val = stop_val
+
+    def __len__(self):
+        check_samplerate()
+        return int(self._length * self._samplerate)
 
     def __iter__(self):
         self.check_samplerate()
@@ -96,6 +108,10 @@ class Box(tracks.BaseTrack):
         super().__init__()
         self._length = length
         self._value = value
+
+    def __len__(self):
+        check_samplerate()
+        return int(self._length * self._samplerate)
 
     def __iter__(self):
         self.check_samplerate()

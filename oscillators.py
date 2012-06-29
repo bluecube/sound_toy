@@ -55,6 +55,18 @@ class Oscillator(BaseTrack):
     def _is_constant(x):
         return not hasattr(x, '__next__')
 
+    def __len__(self):
+        """
+        Return the length of this track in samples or
+        or None if the track is infinite.
+        """
+        check_samplerate()
+
+        if not len(self._slaves):
+            return None
+        else:
+            return min((len(slave) for slave in self._slaves))
+
     def __iter__(self):
         self.check_samplerate()
 
