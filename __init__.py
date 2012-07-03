@@ -1,8 +1,8 @@
-__all__ = [
-    'envelopes',
-    'music',
-    'oscillators',
-    'pygame_player',
-    'sampler',
-    'tracks',
-    'wav_saver']
+from sound_toy import (
+    tracks,
+    oscillators,
+    envelopes,
+    wav_saver,
+    alsa_player,
+    pygame_player,
+    music)
