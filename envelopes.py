@@ -43,14 +43,11 @@ class ADSR(tracks.BaseTrack):
             ]
         self._lengths = lengths
 
-    def __len__(self):
-        check_samplerate()
-        return sum((int(l * self._samplerate) for l in self._lengths))
+    def _sample_lengths(self, samplerate):
+        return (int(l * samplerate) for l in self._lengths)
 
-    def __iter__(self):
-        self.check_samplerate()
-
-        lengths_s = (int(l * self._samplerate) for l in self._lengths)
+    def as_iter(self, samplerate):
+        lengths_s = _sample_lengths()
 
         return itertools.chain.from_iterable(
             itertools.starmap(
@@ -62,6 +59,9 @@ class ADSR(tracks.BaseTrack):
                 )
             ))
 
+    def len(self, samplerate):
+        return sum(_sample_lengths())
+
 
 class Exponential(tracks.BaseTrack):
     def __init__(self, start_val, stop_val, length):
@@ -70,18 +70,16 @@ class Exponential(tracks.BaseTrack):
         self._start_val = start_val
         self._stop_val = stop_val
 
-    def __len__(self):
-        check_samplerate()
-        return int(self._length * self._samplerate)
+    def as_iter(self, samplerate):
+        length = self.len(samplerate)
 
-    def __iter__(self):
-        self.check_samplerate()
-
-        length = int(self._length * self._samplerate)
         n0 = self._start_val
         l = math.log(self._stop_val / n0) / length
 
         return _exp_iterator(n0, l, length)
+
+    def len(self, samplerate):
+        return int(self._length * samplerate)
 
 
 class Linear(tracks.BaseTrack):
@@ -91,19 +89,17 @@ class Linear(tracks.BaseTrack):
         self._start_val = start_val
         self._stop_val = stop_val
 
-    def __len__(self):
-        check_samplerate()
-        return int(self._length * self._samplerate)
-
-    def __iter__(self):
-        self.check_samplerate()
-
-        length = int(float(self._length) * self._samplerate)
+    def as_iter(self, samplerate):
+        length = self.len(samplerate)
         b = float(self._start_val)
         a = (float(self._stop_val) - b) / length
 
         return _lin_iterator(a, b, length)
-        
+
+    def len(self, samplerate):
+        return int(self._length * samplerate)
+
+
 class Box(tracks.BaseTrack):
     def __init__(self, length, value = 1):
         super().__init__()
@@ -112,10 +108,9 @@ class Box(tracks.BaseTrack):
 
     def __len__(self):
         check_samplerate()
-        return int(self._length * self._samplerate)
 
     def __iter__(self):
-        self.check_samplerate()
+        return itertools.repeat(self._value, self.len(samplerate))
 
-        return itertools.repeat(self._value,
-            int(float(self._length) * self._samplerate))
+    def len(self, samplerate):
+        return int(self._length * self._samplerate)

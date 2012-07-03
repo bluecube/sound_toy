@@ -38,91 +38,99 @@ class Oscillator(BaseTrack):
         raise NotImplemented()
 
     @staticmethod
-    def _make_iter(x):
-        if Oscillator._is_constant(x):
-            return itertools.repeat(x)
-        else:
-            return iter(x)
-
-    @staticmethod
-    def _convert(x):
+    def _convert(x, samplerate):
         if x is None:
             return None
         elif isinstance(x, BaseTrack):
-            return iter(x)
+            return x.as_iter(samplerate)
         else:
             return float(x)
 
     @staticmethod
-    def _cumsum(it, add = 0, multiplier = 1):
+    def _cumsum(it, add, multiplier):
+        """
+        Calculate cumulative sum of it, modifying each result
+        using linear function.
+        """
         accumulator = add
         for x in it:
-            yield accumulator
-            accumulator += x * multiplier
+            yield multiplier * accumulator
+            accumulator += x
 
+    @staticmethod
+    def _cumsum2(it, add_it, multiplier):
+        """
+        Calculate cumulative sum of it, modifying each result
+        using linear function.
+        Add is an iterator.
+        """
+        accumulator = 0
+        for x, add in zip(it, add_iter):
+            yield multiplier * accumulator + add
+            accumulator += x
+
+    def _count_and_add(add, step):
+        """
+        Iterate over i * step + add
+        where i goes 1, 2, 3 ...
+        and add is an iterator.
+        """
+        accumulator = 0
+        for x in zip(add):
+            yield accumulator + x
+            accumulator += step
+
+    @staticmethod
     def _is_constant(x):
         return not hasattr(x, '__next__')
 
-    def __len__(self):
-        """
-        Return the length of this track in samples or
-        or None if the track is infinite.
-        """
-        check_samplerate()
+    def as_iter(self, samplerate):
+        freq = self._convert(self._freq, samplerate)
+        phase = self._convert(self._phase, samplerate)
+        amplitude = self._convert(self._amplitude, samplerate)
+        amplitudeHigh = self._convert(self._amplitudeHigh, samplerate)
+        amplitudeLow = self._convert(self._amplitudeLow, samplerate)
 
+        freq_multiplier = 2 * math.pi / samplerate
+
+        # TODO: Measure and optimize this part
+        if self._is_constant(freq):
+            if self._is_constant(phase):
+                x_iterator = itertools.count(phase, freq * freq_multiplier)
+            else:
+                x_iterator = self._count_and_add(phase, step)
+        else:
+            if self._is_constant(phase):
+                x_iterator = self._cumsum(freq, phase, freq_multiplier)
+            else:
+                x_iterator = self._cumsum2(freq, phase, freq_multiplier)
+
+        if amplitude == 1:
+            return (self._func(x) for x in x_iterator)
+        elif amplitude is not None:
+            if self._is_constant(amplitude):
+                return (amplitude * self._func(x) for x in x_iterator)
+            else:
+                return (a * self._func(x) for x, a in zip(x_iterator, amplitude))
+        else:
+            assert amplitude is None
+
+            # this option is a little too complicated, so I'll just collapse it
+            # to the most general case.
+            if self._is_constant(amplitudeHigh):
+                amplitudeHigh = itertools.repeat(amplitudeHigh)
+            if self._is_constant(amplitudeLow):
+                amplitudeLow = itertools.repeat(amplitudeLow)
+
+            return (((ah + al) + (ah - al) *
+                self._func(x)) * 0.5 for
+                x, ah, al in zip(x_iter, amplitudeHigh, amplitudeLow))
+
+    def len(self, samplerate):
         if not len(self._slaves):
             return None
         else:
             return min((len(slave) for slave in self._slaves))
-
-    def __iter__(self):
-        self.check_samplerate()
-
-        freq = self._convert(self._freq)
-        phase = self._convert(self._phase)
-        amplitude = self._convert(self._amplitude)
-        amplitudeHigh = self._convert(self._amplitudeHigh)
-        amplitudeLow = self._convert(self._amplitudeLow)
-
-        freq_multiplier = 2 * math.pi / self._samplerate
-
-        if Oscillator._is_constant(freq):
-            if Oscillator._is_constant(phase):
-                x_iterator = itertools.count(phase, freq * freq_multiplier)
-            else:
-                x_iterator = itertools.count(0, freq * freq_multiplier)
-        else:
-            if Oscillator._is_constant(phase):
-                x_iterator = self._cumsum(freq, phase, freq_multiplier)
-            else:
-                x_iterator = self._cumsum(freq, 0, freq_multiplier)
-
-
-        if Oscillator._is_constant(phase):
-            if amplitude is not None:
-                if Oscillator._is_constant(amplitude):
-                    return (amplitude * self._func(x) for x in x_iterator)
-                else:
-                    return (a * self._func(x) for x, a in zip(x_iterator, amplitude))
-        else:
-            if amplitude is not None:
-                if Oscillator._is_constant(amplitude):
-                    return (amplitude * self._func(x + p) for x, p in zip(x_iterator, phase))
-                else:
-                    return (a * self._func(x + p) for x, a, p in zip(x_iterator, amplitude, phase))
-
-
-        assert amplitude is None
-
-        zipped = zip(
-            self._cumsum(self._make_iter(freq), 0, freq_multiplier),
-            self._make_iter(amplitudeHigh),
-            self._make_iter(amplitudeLow),
-            self._make_iter(phase))
-
-        return (((ah + al) + (ah - al) *
-            self._func(x + p)) * 0.5 for
-            x, ah, al, p in zipped)
 
 
 class SineOscillator(Oscillator):

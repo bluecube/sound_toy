@@ -6,9 +6,7 @@ from .tracks import NumpyTrack
 def save(track, filename, samplerate=44100, blocksize=4096):
     """
     Save a track to a file.
-    Forces samplerate of the track to the parameter.
     """
-    track.set_samplerate(samplerate)
 
     w = wave.open(filename, 'w')
     w.setparams((1, 2, samplerate, 0, 'NONE', 'not compressed'))
@@ -17,7 +15,7 @@ def save(track, filename, samplerate=44100, blocksize=4096):
     dtype = numpy.dtype('<i2')
 
     try:
-        for values in track.as_arrays_iter(blocksize, None):
+        for values in track.as_arrays_iter(samplerate, blocksize, None):
             numpy.clip(values, -1, 1, out=values)
             values *= maximum
 

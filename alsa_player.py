@@ -6,8 +6,6 @@ def play(track, samplerate=44100, periodsize=512, card='default'):
     Play a track through alsa.
     Forces samplerate of the track.
     """
-    track.set_samplerate(samplerate)
-
     pcm = alsaaudio.PCM(
         type=alsaaudio.PCM_PLAYBACK,
         mode=alsaaudio.PCM_NORMAL,
@@ -19,7 +17,7 @@ def play(track, samplerate=44100, periodsize=512, card='default'):
 
     dtype = numpy.dtype('<f4')
 
-    for values in track.as_arrays_iter(periodsize):
+    for values in track.as_arrays_iter(samplerate, periodsize):
         numpy.clip(values, -1, 1, out=values)
         out = numpy.array(values, dtype);
 
