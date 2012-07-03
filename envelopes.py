@@ -30,7 +30,7 @@ def _exp_iterator(n0, l, count):
 class ADSR(tracks.BaseTrack):
     def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1,
         noisefloor = 0):
-        super().__init__()
+        super(ADSR, self).__init__()
 
         if len(lengths) != 4:
             raise Exception('lengths must be 4 items long.')
@@ -65,7 +65,7 @@ class ADSR(tracks.BaseTrack):
 
 class Exponential(tracks.BaseTrack):
     def __init__(self, start_val, stop_val, length):
-        super().__init__()
+        super(Exponential, self).__init__()
         self._length = length
         self._start_val = start_val
         self._stop_val = stop_val
@@ -84,7 +84,7 @@ class Exponential(tracks.BaseTrack):
 
 class Linear(tracks.BaseTrack):
     def __init__(self, start_val, stop_val, length):
-        super().__init__()
+        super(Linear, self).__init__()
         self._length = length
         self._start_val = start_val
         self._stop_val = stop_val
@@ -102,7 +102,7 @@ class Linear(tracks.BaseTrack):
 
 class Box(tracks.BaseTrack):
     def __init__(self, length, value = 1):
-        super().__init__()
+        super(Box, self).__init__()
         self._length = length
         self._value = value
 

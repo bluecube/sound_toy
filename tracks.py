@@ -3,7 +3,7 @@ import math
 import itertools
 import numpy
 
-class BaseTrack:
+class BaseTrack(object):
     """
     A track represents any that can be sampled -- sound, frequency, volume, ...
     """
@@ -94,7 +94,7 @@ class NumpyTrack(BaseTrack):
     """
 
     def __init__(self, data, samplerate):
-        super().__init__()
+        super(NumpyTrack, self).__init__()
         self._data = data
         self._samplerate = samplerate
 

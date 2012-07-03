@@ -6,7 +6,7 @@ class Oscillator(BaseTrack):
     def __init__(self, freq, amplitude = 1, amplitudeLow = None,
         amplitudeHigh = None, phase = 0):
 
-        super().__init__()
+        super(Oscillator, self).__init__()
 
         self._freq = freq
         self.add_slave(freq)
