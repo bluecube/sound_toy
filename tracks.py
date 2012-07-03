@@ -115,7 +115,7 @@ class Chain(BaseTrack):
 
 
 
-class SampledData(BaseTrack):
+class NumpyTrack(BaseTrack):
     """
     Track that wraps array of pre-sampled numpy data.
     """

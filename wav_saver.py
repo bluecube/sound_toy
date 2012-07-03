@@ -1,7 +1,7 @@
 import wave
 import numpy
 
-from .tracks import SampledData
+from .tracks import NumpyTrack
 
 def save(track, filename, samplerate=44100, blocksize=4096):
     """
@@ -46,7 +46,7 @@ def open(filename):
         ret = []
         for i in range(w.getnchannels()):
             ret.append(
-                SampledData(data_float[i::w.getnchannels()], w.getframerate()))
+                NumpyTrack(data_float[i::w.getnchannels()], w.getframerate()))
 
         return ret
 
