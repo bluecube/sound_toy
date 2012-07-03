@@ -3,7 +3,9 @@ import itertools
 import math
 
 class Oscillator(BaseTrack):
-    def __init__(self, freq, amplitude = 1, amplitudeLow = None, amplitudeHigh = None, phase = 0):
+    def __init__(self, freq, amplitude = 1, amplitudeLow = None,
+        amplitudeHigh = None, phase = 0):
+
         super().__init__()
 
         self._freq = freq
@@ -24,9 +26,15 @@ class Oscillator(BaseTrack):
             self.add_slave(amplitudeLow)
             self.add_slave(amplitudeHigh)
         else:
-           raise Exception("Both amplitudeLow and amplitudeHigh must be either None or not None")
+           raise Exception("Both amplitudeLow and amplitudeHigh" +
+            "must be either None or not None")
 
     def _func(self, x):
+        """
+        The actual function that generates the sound.
+        Should be periodic from 0 to 2 Pi, return values from -1 to 1.
+        Must be overriden in subclasses.
+        """
         raise NotImplemented()
 
     @staticmethod

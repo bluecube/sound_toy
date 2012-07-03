@@ -28,7 +28,8 @@ def _exp_iterator(n0, l, count):
     return (n0 * math.exp(x * l) for x in it)
 
 class ADSR(tracks.BaseTrack):
-    def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1, noisefloor = 0.001):
+    def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1,
+        noisefloor = 0):
         super().__init__()
 
         if len(lengths) != 4:
