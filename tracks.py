@@ -100,7 +100,9 @@ class NumpyTrack(BaseTrack):
 
     def _check_samplerate(self, samplerate):
         if self._samplerate != samplerate:
-            raise Exception("The track has fixed sample rate. Use resampler.")
+            raise Exception(
+                ("The track has samplerate fixed to {} Hz, requested {} Hz. " +
+                "Use resampler.").format(self._samplerate, samplerate))
 
     def as_iter(self, samplerate):
         self._check_samplerate(saplerate)
