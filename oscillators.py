@@ -46,8 +46,16 @@ class Oscillator(BaseTrack):
     def _func(self, x):
         """
         The actual function that generates the sound.
-        Should be periodic from 0 to 2 Pi, return values from -1 to 1.
+        Should be periodic from 0 to self._period, return values from -1 to 1.
         Must be overriden in subclasses.
+        """
+        raise NotImplemented()
+
+    @property
+    def _period(self):
+        """
+        This is a value that must be overriden in subclasses and specifies
+        length of period of _func.
         """
         raise NotImplemented()
 
@@ -112,7 +120,7 @@ class Oscillator(BaseTrack):
         amplitudeHigh = self._convert(self._amplitudeHigh, samplerate)
         amplitudeLow = self._convert(self._amplitudeLow, samplerate)
 
-        freq_multiplier = 2 * math.pi / samplerate
+        freq_multiplier = self._period / float(samplerate)
 
         # TODO: Measure and optimize this part
         if self._is_constant(freq):
@@ -161,21 +169,25 @@ class Oscillator(BaseTrack):
 
 class SineOscillator(Oscillator):
     _func = math.sin
+    _period = 2 * math.pi
 
 
 class SawtoothOscillator(Oscillator):
     @staticmethod
     def _func(x):
-        return math.fmod(x / math.pi + 1, 2) - 1
+        return math.fmod(x + 1, 2) - 1
+    _period = 2
 
 
 class SquareOscillator(Oscillator):
     @staticmethod
     def _func(x):
-        return 1 - math.fmod(x // math.pi, 2) * 2
+        return 1 - math.fmod(int(x), 2) * 2
+    _period = 2
 
 
 class TriangleOscillator(Oscillator):
     @staticmethod
     def _func(x):
-        return 1 - math.fabs(math.fmod(x * 2 / math.pi + 1, 4) - 2)
+        return 1 - math.fabs(math.fmod(x + 1, 4) - 2)
+    _period = 4
