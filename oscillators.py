@@ -1,8 +1,21 @@
 from .tracks import BaseTrack
+from .envelopes import Box
 import itertools
 import math
 
 class Oscillator(BaseTrack):
+    """
+    Oscillators are based on simple periodic functions and
+    generate signals with selectable (and possibly variable)
+    frequency, amplitude and phase.
+    The oscillator implementation attempts to minimize the amount
+    of work necessary for generating the signal and contains several
+    fast paths to do this.
+
+    Specifically, if any parameter is a instance of envelopes.Box,
+    it is treated as a constant and the track is shortened elsewhere.
+    """
+
     def __init__(self, freq, amplitude = 1, amplitudeLow = None,
         amplitudeHigh = None, phase = 0):
 
@@ -37,10 +50,15 @@ class Oscillator(BaseTrack):
         """
         raise NotImplemented()
 
-    @staticmethod
-    def _convert(x, samplerate):
+    def _convert(self, x, samplerate):
         if x is None:
             return None
+        elif isinstance(x, Box):
+            if self._limit is None:
+                self._limit = x.len(samplerate)
+            else:
+                self._limit = min(self._limit, x.len(samplerate))
+            return float(x._value)
         elif isinstance(x, BaseTrack):
             return x.as_iter(samplerate)
         else:
@@ -85,6 +103,8 @@ class Oscillator(BaseTrack):
         return not hasattr(x, '__next__')
 
     def as_iter(self, samplerate):
+        self._limit = None
+
         freq = self._convert(self._freq, samplerate)
         phase = self._convert(self._phase, samplerate)
         amplitude = self._convert(self._amplitude, samplerate)
@@ -106,12 +126,12 @@ class Oscillator(BaseTrack):
                 x_iterator = self._cumsum2(freq, phase, freq_multiplier)
 
         if amplitude == 1:
-            return (self._func(x) for x in x_iterator)
+            ret = (self._func(x) for x in x_iterator)
         elif amplitude is not None:
             if self._is_constant(amplitude):
-                return (amplitude * self._func(x) for x in x_iterator)
+                ret = (amplitude * self._func(x) for x in x_iterator)
             else:
-                return (a * self._func(x) for x, a in zip(x_iterator, amplitude))
+                ret = (a * self._func(x) for x, a in zip(x_iterator, amplitude))
         else:
             assert amplitude is None
 
@@ -122,9 +142,14 @@ class Oscillator(BaseTrack):
             if self._is_constant(amplitudeLow):
                 amplitudeLow = itertools.repeat(amplitudeLow)
 
-            return (((ah + al) + (ah - al) *
+            ret = (((ah + al) + (ah - al) *
                 self._func(x)) * 0.5 for
                 x, ah, al in zip(x_iter, amplitudeHigh, amplitudeLow))
+
+        if self._limit is None:
+            return ret
+        else:
+            return itertools.islice(ret, self._limit)
 
     def len(self, samplerate):
         if not len(self._slaves):
