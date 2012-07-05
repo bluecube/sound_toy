@@ -106,11 +106,8 @@ class Box(tracks.BaseTrack):
         self._length = length
         self._value = value
 
-    def __len__(self):
-        check_samplerate()
-
-    def __iter__(self):
+    def as_iter(self, samplerate):
         return itertools.repeat(self._value, self.len(samplerate))
 
     def len(self, samplerate):
-        return int(self._length * self._samplerate)
+        return int(self._length * samplerate)
