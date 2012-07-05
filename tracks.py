@@ -10,6 +10,8 @@ class BaseTrack(object):
     def __init__(self, *slaves):
         self._slaves = list(slaves)
 
+        self.name = ""
+
     def as_iter(self, samplerate):
         """
         Return interator with individual track values.
