@@ -2,6 +2,7 @@ from .tracks import BaseTrack
 from .envelopes import Box
 import itertools
 import math
+import collections
 
 class Oscillator(BaseTrack):
     """
@@ -100,7 +101,7 @@ class Oscillator(BaseTrack):
 
     @staticmethod
     def _is_constant(x):
-        return not hasattr(x, '__next__')
+        return not isinstance(x, collections.Iterator)
 
     def as_iter(self, samplerate):
         self._limit = None
