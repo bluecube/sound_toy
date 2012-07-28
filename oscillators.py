@@ -103,7 +103,7 @@ class Oscillator(BaseTrack):
         and add is an iterator.
         """
         accumulator = 0
-        for x in zip(add):
+        for x in add:
             yield accumulator + x
             accumulator += step
 
