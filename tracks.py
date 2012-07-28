@@ -10,7 +10,7 @@ class BaseTrack(object):
     def __init__(self, *slaves):
         self._slaves = list(slaves)
 
-        self.name = ""
+        self.name = self.__class__.__name__
 
     def as_iter(self, samplerate):
         """
