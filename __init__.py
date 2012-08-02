@@ -6,4 +6,5 @@ from sound_toy import (
     alsa,
     pygame_player,
     waveform_plot,
+    rhythm,
     music)

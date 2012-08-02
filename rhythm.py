@@ -1,32 +1,73 @@
+import math
+import itertools
+
+from .tracks import BaseTrack
+
 class Rhythm:
-    def __init__(self, time_sig, bpm = 100):
+    """
+    Rhythm is a class converting beats and measures to time.
+    """
+    def __init__(self, measure_len, bpm = 100):
         """
-        Time sig is tuple (beat_count_per_measure, beat_note_value)
-        """
-        self._sig = time_sig
-        self._bpm = bpm
+        Initialize the rhythm.
 
-    def timing(self, beat, measure, note_value):
+        Parameters:
+            measure_len: Number of beats per measure.
+            bpm: Beats per minute.
         """
-        Returns tuple with absolute time and length of a note.
-        """
-        return (self.time(beat, measure), self.note_len(note_value))
+        self.measure_len = measure_len
+        self.bpm = bpm
+        self._spb = 60 / bpm
 
-    def note_len(self, note_value):
+    def time(self, beat, measure = 0):
         """
-        Return length of note in seconds.
-        note_value is 4, 16 ... 
-        """
-        return 60 * self._sig[1] / (note_value * self._bpm)
+        Returns the absolute time of the given beat in given measure,
+        or equivalently note length. 
 
-    def time(self, beat, measure):
+        r.time(2, 4) returns time of a third beat in fifth measure (0 based),
+        r.time(0.5) returns time of halfth beat in first measure or length
+            of 0.5 beat note (cf. eighth note in ?/4 rhythm)
         """
-        Returns the absolute time of the given beat in given measure.
-        """
-        return (measure * self._sig[0] + beat) * 60 / self._bpm
+        return (measure * self.measure_len + beat) * self._spb
 
-    def measure_len(self):
-        return self.time(0, 1)
+    __call__ = time
 
     def __str__(self):
-        return "{}/{} rhythm @ {} bpm".format(self._sig[0], self._sig[1], self._bpm)
+        return "Rhythm @ {} bpm, {} beats per measure".format(self.bpm, self.measure_len)
+
+class Repeat(BaseTrack):
+    def __init__(self, track, rhythm, beat_set, repeat_period = None):
+        super(Repeat, self).__init__()
+        self._track = track
+        self._rhythm = rhythm
+        self._beat_set = beat_set
+
+        if repeat_period is None:
+            self._modulus = (max(beat_set) // rhythm.measure_len + 1) * rhythm.measure_len
+        else:
+            self._modulus = repeat_period
+
+        self.add_slave(track)
+
+    def as_iter(self, samplerate, offset = 0):
+        beat_set = {int(self._rhythm.time(x) * samplerate) for x in self._beat_set}
+        modulus = int(self._rhythm.time(self._modulus) * samplerate)
+
+        started = []
+
+        for i in itertools.count(offset):
+            if (i % modulus) in beat_set:
+                started.append(self._track.as_iter(samplerate, i))
+
+            new_started = []
+            out = 0
+            for it in started:
+                try:
+                    out += next(it)
+                except StopIteration:
+                    pass
+                else:
+                    new_started.append(it)
+
+            started = new_started
+            yield out
