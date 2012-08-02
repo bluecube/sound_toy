@@ -47,7 +47,7 @@ class ADSR(tracks.BaseTrack):
         return (int(l * samplerate) for l in self._lengths)
 
     def as_iter(self, samplerate):
-        lengths_s = _sample_lengths()
+        lengths_s = self._sample_lengths(samplerate)
 
         return itertools.chain.from_iterable(
             itertools.starmap(
@@ -60,7 +60,7 @@ class ADSR(tracks.BaseTrack):
             ))
 
     def len(self, samplerate):
-        return sum(_sample_lengths())
+        return sum(self._sample_lengths(samplerate))
 
 
 class Exponential(tracks.BaseTrack):
