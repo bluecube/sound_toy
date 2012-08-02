@@ -27,7 +27,7 @@ class BaseTrack(object):
         """
         return numpy.fromiter(self.as_iter(samplerate), numpy.float)
 
-    def as_arrays_iter(self, samplerate, size, fill = 0):
+    def as_arrays_iter(self, samplerate, size, zfill = True):
         """
         Return iterator that gives numpy arrays of length size containing
         the track's data.
@@ -41,13 +41,8 @@ class BaseTrack(object):
 
             if not len(arr):
                 return
-            elif len(arr) < size and fill is not None:
-                yield numpy.append(
-                    arr,
-                    numpy.fromiter(
-                        itertools.repeat(fill, size - len(arr)),
-                        dtype=numpy.float))
-
+            elif len(arr) < size and zfill:
+                yield numpy.append(arr, numpy.zeros(size - len(arr)))
                 return
             else:
                 yield numpy.array(arr)
@@ -114,7 +109,7 @@ class NumpyTrack(BaseTrack):
         self._check_samplerate(saplerate)
         return self._data
 
-    def as_arrays_iter(self, samplerate, size, fill = 0):
+    def as_arrays_iter(self, samplerate, size, zfill = True):
         self._check_samplerate(samplerate)
 
         for offset in itertools.count(0, size):
@@ -122,16 +117,12 @@ class NumpyTrack(BaseTrack):
 
             if not len(arr):
                 return
-            elif len(arr) < size and fill is not None:
-                yield numpy.append(
-                    arr,
-                    numpy.fromiter(
-                        itertools.repeat(fill, size - len(arr)),
-                        dtype=numpy.float))
-
+            elif len(arr) < size and zfill:
+                yield numpy.append(arr, numpy.zeros(size - len(arr)))
                 return
             else:
                 yield numpy.array(arr)
 
     def len(self, samplerate):
+        self._check_samplerate(saplerate)
         return len(self._data)

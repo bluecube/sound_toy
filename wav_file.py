@@ -15,7 +15,7 @@ def save(track, filename, samplerate=44100, blocksize=4096):
     dtype = numpy.dtype('<i2')
 
     try:
-        for values in track.as_arrays_iter(samplerate, blocksize, None):
+        for values in track.as_arrays_iter(samplerate, blocksize, zfill = False):
             numpy.clip(values, -1, 1, out=values)
             values *= maximum
 
