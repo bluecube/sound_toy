@@ -56,6 +56,7 @@ class ADSR(tracks.BaseTrack):
                     ((b - a) / l, a, l) for
                     ((a, b), l) in
                     zip(self._values, lengths_s)
+                    if l > 0
                 )
             ))
 
