@@ -1,19 +1,8 @@
+from __future__ import division
 import itertools
 import math
 
 from . import tracks
-
-def _lin_iterator(a, b, count = None):
-    """
-    Iterate over linear function a * x + b where x goes from 0 to count.
-    If count is None, iterates to infinity.
-    """
-    if count is None:
-        it = itertools.count()
-    else:
-        it = iter(range(count))
-
-    return (a * x + b for x in it)
 
 def _exp_iterator(n0, l, count):
     """
@@ -27,41 +16,105 @@ def _exp_iterator(n0, l, count):
 
     return (n0 * math.exp(x * l) for x in it)
 
-class ADSR(tracks.BaseTrack):
-    def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1,
-        noisefloor = 0):
-        super(ADSR, self).__init__()
+class Interpolate(tracks.BaseTrack):
+    """ An envelope that go through the given points using
+    a interpolation function."""
 
+    def __init__(self, points, length = None):
+        """ Points is an iterable of (time, value) tuples.
+        Unless the points define it otherwise, the envelope starts in (0, 0)
+        and ends by repeating the last value.
+        If length is None, then it defaults to the time position of the last point."""
+        super(Interpolate, self).__init__()
+
+        points = [(float(x), float(y)) for (x, y) in points]
+        points.sort()
+
+        if length is None:
+            if not len(points):
+                raise Exception("Length is not specified and ther are no points. This is bad.")
+
+            length = points[-1][0]
+
+        if not len(points) or points[0][0] > 0:
+            points = [(0, 0)] + points
+
+        if points[-1][0] < length:
+            points = points + [(length, points[-1][1])]
+
+        i0 = None
+        i1 = None
+        for i, (x, y) in enumerate(points):
+            if x >= 0 and i0 is None:
+                if i == 0:
+                    assert x == 0
+                    i0 = 0
+                else:
+                    i0 = i - 1
+            if x > length:
+                if i == len(poins) - 1:
+                    assert x == length
+                    i1 = len(points)
+                else:
+                    i1 = i + 1
+                break
+
+        self._points = points[i0:i1]
+        self._length = length
+
+    def as_iter(self, samplerate, offset = 0):
+        points = [
+            (round(t * samplerate), v)
+            for (t, v) in self._points]
+
+        return itertools.chain.from_iterable(
+            self._interp_iterator(
+                range(points[i][0], points[i + 1][0]),
+                points, i)
+            for i in range(len(points) - 1))
+
+    def len(self, samplerate):
+        return self._length * samplerate
+        
+    @staticmethod
+    def _interp_iterator(x_iter, points, i):
+        """ Yield values for every x in x_iter.
+
+        x_iter -- iterator of x values.
+        points -- sorted list of (x, y) tuples.
+        i -- specifies the pair of points to interpolate between (from i to (i + 1))."""
+        raise NotImplementedError()
+
+
+class PiecewiseLinear(Interpolate):
+    """ Interpolate the points using line segments """
+    @staticmethod
+    def _interp_iterator(x_iter, points, i):
+        x0, y0 = points[i]
+        x1, y1 = points[i + 1]
+
+        count = x1 - x0
+
+        if count == 0:
+            return []
+
+        a = (y1 - y0) / count
+        b = y0 - a * x0
+
+        return (a * x + b for x in x_iter)
+
+
+class ADSR(PiecewiseLinear):
+    def __init__(self, lengths, sustain_volume = 0.5, top_volume = 1, noisefloor = 0):
         if len(lengths) != 4:
             raise Exception('lengths must be 4 items long.')
 
-        self._values = [
-            (noisefloor, top_volume),
-            (top_volume, sustain_volume),
-            (sustain_volume, sustain_volume),
-            (sustain_volume, noisefloor)
-            ]
-        self._lengths = lengths
+        values = [noisefloor, top_volume, sustain_volume, sustain_volume, noisefloor]
+        times = [0]
+        for length in lengths:
+            times.append(times[-1] + length)
 
-    def _sample_lengths(self, samplerate):
-        return (int(l * samplerate) for l in self._lengths)
-
-    def as_iter(self, samplerate, offset = 0):
-        lengths_s = self._sample_lengths(samplerate)
-
-        return itertools.chain.from_iterable(
-            itertools.starmap(
-                _lin_iterator,
-                (
-                    ((b - a) / l, a, l) for
-                    ((a, b), l) in
-                    zip(self._values, lengths_s)
-                    if l > 0
-                )
-            ))
-
-    def len(self, samplerate):
-        return sum(self._sample_lengths(samplerate))
+        super(ADSR, self).__init__(points = zip(times, values))
 
 
 class Exponential(tracks.BaseTrack):
@@ -83,32 +136,14 @@ class Exponential(tracks.BaseTrack):
         return int(self._length * samplerate)
 
 
-class Linear(tracks.BaseTrack):
-    def __init__(self, start_val, stop_val, length):
-        super(Linear, self).__init__()
-        self._length = length
-        self._start_val = start_val
-        self._stop_val = stop_val
+class Box(PiecewiseLinear):
+    """Box envelope. Triggers fast paths in oscillators."""
 
-    def as_iter(self, samplerate, offset = 0):
-        length = self.len(samplerate)
-        b = float(self._start_val)
-        a = (float(self._stop_val) - b) / length
-
-        return _lin_iterator(a, b, length)
-
-    def len(self, samplerate):
-        return int(self._length * samplerate)
-
-
-class Box(tracks.BaseTrack):
     def __init__(self, length, value = 1):
-        super(Box, self).__init__()
         self._length = length
         self._value = value
 
+        super(Box, self).__init__(points = [(0, value)], length = length)
+
     def as_iter(self, samplerate, offset = 0):
         return itertools.repeat(self._value, self.len(samplerate))
-
-    def len(self, samplerate):
-        return int(self._length * samplerate)
