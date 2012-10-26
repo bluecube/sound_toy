@@ -1,6 +1,7 @@
 from __future__ import division
 import itertools
 import math
+import operator
 
 from . import tracks
 
@@ -28,7 +29,8 @@ class Interpolate(tracks.BaseTrack):
         super(Interpolate, self).__init__()
 
         points = [(float(x), float(y)) for (x, y) in points]
-        points.sort()
+
+        points.sort(key=operator.itemgetter(0))
 
         if length is None:
             if not len(points):
