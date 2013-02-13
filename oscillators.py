@@ -4,6 +4,9 @@ import itertools
 import math
 import collections
 
+if hasattr(itertools, 'izip'):
+    zip = itertools.izip
+
 class Oscillator(BaseTrack):
     """
     Oscillators are based on simple periodic functions and
