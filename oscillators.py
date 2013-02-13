@@ -99,6 +99,7 @@ class Oscillator(BaseTrack):
             yield multiplier * accumulator + add
             accumulator += x
 
+    @staticmethod
     def _count_and_add(add, step):
         """
         Iterate over i * step + add
@@ -129,7 +130,7 @@ class Oscillator(BaseTrack):
             if self._is_constant(phase):
                 x_iterator = itertools.count(phase, freq * freq_multiplier)
             else:
-                x_iterator = self._count_and_add(phase, step)
+                x_iterator = self._count_and_add(phase, freq * freq_multiplier)
         else:
             if self._is_constant(phase):
                 x_iterator = self._cumsum(freq, phase, freq_multiplier)
@@ -155,7 +156,7 @@ class Oscillator(BaseTrack):
 
             ret = (((ah + al) + (ah - al) *
                 self._func(x)) * 0.5 for
-                x, ah, al in zip(x_iter, amplitudeHigh, amplitudeLow))
+                x, ah, al in zip(x_iterator, amplitudeHigh, amplitudeLow))
 
         if self._limit is None:
             return ret

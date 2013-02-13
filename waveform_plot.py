@@ -13,7 +13,7 @@ else:
             fig = plt.figure()
             plot = fig.add_subplot(1, 1, 1)
             plot.set_title(track.name)
-            plot.set_xlabel("time [s]")
+            plot.set_xlabel("time [samples]")
             plot.plot(track.as_array(samplerate))
 
         plt.show()
