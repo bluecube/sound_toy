@@ -1,6 +1,6 @@
 class Tone:
     """
-    A tone.
+    An equally tempered tone.
     Internally represented in chromatic scale.
     """
 
@@ -49,7 +49,7 @@ class Tone:
             return n, None
 
         octave = int(octave)
-        
+
         return n, octave
 
     @property
@@ -65,12 +65,12 @@ class Tone:
     @property
     def freq(self):
         return self.FREQ_A * 2**((self.n - self.CHROMATIC_POS_A) / self.OCTAVE)
-        
+
     def __str__(self):
         return "{} ({} Hz)".format(self.name, self.freq)
 
     def __repr__(self):
-        return self.name
+        return '{}({})'.format(self.__class__.__name__, repr(self.name))
 
     def __float__(self):
         return self.freq
