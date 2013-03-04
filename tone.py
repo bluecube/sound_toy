@@ -81,7 +81,7 @@ class Tone:
 
 class Scale:
     def __init__(self, root=Tone('C4')):
-        self.root = root
+        self.root = Tone(root)
 
     def __getitem__(self, index):
         if isinstance(index, slice):
