@@ -1,6 +1,6 @@
 class Tone:
     """
-    A tone.
+    An equally tempered tone.
     Internally represented in chromatic scale.
     """
 
@@ -9,15 +9,18 @@ class Tone:
     FREQ_A = 440
     CHROMATIC_POS_A = OCTAVE * 4 + 8
 
-    def __init__(self, n, octave=4):
-        if isinstance(n, str):
-            self.n, new_octave = self._parsename(n)
-            if new_octave is not None:
-                octave = new_octave
+    def __init__(self, t, octave=4):
+        if isinstance(t, Tone):
+            self.n = t.n
         else:
-            self.n = n
+            if isinstance(t, str):
+                self.n, new_octave = self._parsename(t)
+                if new_octave is not None:
+                    octave = new_octave
+            else:
+                self.n = t
 
-        self.n += octave * self.OCTAVE
+                self.n += octave * self.OCTAVE
 
     @classmethod
     def _parsename(cls, name): 
@@ -25,8 +28,9 @@ class Tone:
 
         n = None
 
+        letter = name[0].upper()
         for index, tone_name in cls.NAMES.items():
-            if name[0] == tone_name:
+            if letter == tone_name:
                 n = index
                 break
 
@@ -49,7 +53,7 @@ class Tone:
             return n, None
 
         octave = int(octave)
-        
+
         return n, octave
 
     @property
@@ -65,12 +69,12 @@ class Tone:
     @property
     def freq(self):
         return self.FREQ_A * 2**((self.n - self.CHROMATIC_POS_A) / self.OCTAVE)
-        
+
     def __str__(self):
         return "{} ({} Hz)".format(self.name, self.freq)
 
     def __repr__(self):
-        return self.name
+        return '{}({})'.format(self.__class__.__name__, repr(self.name))
 
     def __float__(self):
         return self.freq
@@ -80,7 +84,7 @@ class Tone:
 
 class Scale:
     def __init__(self, root=Tone('C4')):
-        self.root = root
+        self.root = Tone(root)
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -105,7 +109,7 @@ class Scale:
 
 class ChromaticScale(Scale):
     def tone(self, i):
-        return Tone(self.root.n + index)
+        return Tone(self.root.n + i)
 
     def __len__(self):
         return Tone.OCTAVE
