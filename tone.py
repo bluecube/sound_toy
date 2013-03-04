@@ -25,8 +25,9 @@ class Tone:
 
         n = None
 
+        letter = name[0].upper()
         for index, tone_name in cls.NAMES.items():
-            if name[0] == tone_name:
+            if letter == tone_name:
                 n = index
                 break
 
