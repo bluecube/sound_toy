@@ -7,4 +7,4 @@ from sound_toy import (
     pygame_player,
     waveform_plot,
     rhythm,
-    music)
+    tone)
