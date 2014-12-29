@@ -20,7 +20,7 @@ class Tone:
             else:
                 self.n = t
 
-                self.n += octave * self.OCTAVE
+            self.n += octave * self.OCTAVE
 
     @classmethod
     def _parsename(cls, name): 
