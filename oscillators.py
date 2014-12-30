@@ -62,7 +62,7 @@ class Oscillator(BaseTrack):
         """
         raise NotImplemented()
 
-    def _convert(self, x, samplerate, offset):
+    def _convert(self, x, samplerate):
         if x is None:
             return None
         elif isinstance(x, Box):
@@ -72,7 +72,7 @@ class Oscillator(BaseTrack):
                 self._limit = min(self._limit, x.len(samplerate))
             return float(x._value)
         elif isinstance(x, BaseTrack):
-            return x.as_iter(samplerate, offset)
+            return x.as_iter(samplerate)
         else:
             return float(x)
 
@@ -115,14 +115,14 @@ class Oscillator(BaseTrack):
     def _is_constant(x):
         return not isinstance(x, collections.Iterator)
 
-    def as_iter(self, samplerate, offset = 0):
+    def as_iter(self, samplerate):
         self._limit = None
 
-        freq = self._convert(self._freq, samplerate, offset)
-        phase = self._convert(self._phase, samplerate, offset)
-        amplitude = self._convert(self._amplitude, samplerate, offset)
-        amplitudeHigh = self._convert(self._amplitudeHigh, samplerate, offset)
-        amplitudeLow = self._convert(self._amplitudeLow, samplerate, offset)
+        freq = self._convert(self._freq, samplerate)
+        phase = self._convert(self._phase, samplerate)
+        amplitude = self._convert(self._amplitude, samplerate)
+        amplitudeHigh = self._convert(self._amplitudeHigh, samplerate)
+        amplitudeLow = self._convert(self._amplitudeLow, samplerate)
 
         freq_multiplier = self._period / float(samplerate)
 

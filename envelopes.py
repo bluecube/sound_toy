@@ -63,7 +63,7 @@ class Interpolate(tracks.BaseTrack):
         self._points = points[i0:i1]
         self._length = length
 
-    def as_iter(self, samplerate, offset = 0):
+    def as_iter(self, samplerate):
         points = [
             (round(t * samplerate), v)
             for (t, v) in self._points]
@@ -125,7 +125,7 @@ class Exponential(tracks.BaseTrack):
         self._start_val = start_val
         self._stop_val = stop_val
 
-    def as_iter(self, samplerate, offset = 0):
+    def as_iter(self, samplerate):
         length = self.len(samplerate)
 
         n0 = self._start_val
@@ -146,5 +146,5 @@ class Box(PiecewiseLinear):
 
         super(Box, self).__init__(points = [(0, value)], length = length)
 
-    def as_iter(self, samplerate, offset = 0):
+    def as_iter(self, samplerate):
         return itertools.repeat(self._value, self.len(samplerate))
