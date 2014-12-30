@@ -76,8 +76,8 @@ class Interpolate(tracks.BaseTrack):
             for i in range(len(points) - 1))
 
     def len(self, samplerate):
-        return self._length * samplerate
-        
+        return int(self._length * samplerate)
+
     @staticmethod
     def _interp_iterator(x_iter, points, i):
         """ Yield values for every x in x_iter.
