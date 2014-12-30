@@ -165,9 +165,9 @@ class Oscillator(BaseTrack):
 
     def len(self, samplerate):
         if not len(self._slaves):
-            return None
+            return float('inf')
         else:
-            return min((len(slave) for slave in self._slaves))
+            return min((slave.len(samplerate) for slave in self._slaves if slave is not None))
 
 
 class SineOscillator(Oscillator):
