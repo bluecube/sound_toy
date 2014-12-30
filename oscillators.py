@@ -95,7 +95,7 @@ class Oscillator(BaseTrack):
         Add is an iterator.
         """
         accumulator = 0
-        for x, add in zip(it, add_iter):
+        for x, add in zip(it, add_it):
             yield multiplier * accumulator + add
             accumulator += x
 
