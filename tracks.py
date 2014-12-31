@@ -68,7 +68,8 @@ class BaseTrack(object):
     def len(self, samplerate):
         """
         Return the length of this track in samples or
-        or None if the track is infinite.
+        or infinity if the track is infinite.
+        May sometime return a too high value (for mixers).
         """
         raise NotImplemented()
 

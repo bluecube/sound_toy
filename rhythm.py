@@ -30,6 +30,18 @@ class Rhythm:
         """
         return (measure * self.measure_len + beat) * self._spb
 
+    def trigger_iterator(self, samplerate):
+        """ Returns infinite iterator of bools, one per sample, True if beat falls into this sample. """
+        beat = self._spb * samplerate
+        i = beat # First sample is beat
+        while True:
+            if i >= beat:
+                i -= beat
+                yield True
+            else:
+                yield False
+            i += 1
+
     __call__ = time
 
     def __str__(self):
