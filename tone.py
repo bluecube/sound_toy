@@ -104,7 +104,7 @@ class Scale:
 
     def tone(self, i):
         a, b = divmod(i, len(self.HALFTONES))
-        return Tone(self.root.n + a * Tone.OCTAVE + self.HALFTONES[b])
+        return Tone(self.root.n + self.HALFTONES[b], octave = a)
 
 
 class ChromaticScale(Scale):
