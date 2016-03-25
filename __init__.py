@@ -6,7 +6,9 @@ from sound_toy import (
     envelopes,
     wav_file,
     rhythm,
-    tone)
+    tone,
+    mixer,
+    drum_machine)
 
 try:
     from sound_toy import alsa

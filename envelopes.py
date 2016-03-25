@@ -2,6 +2,7 @@ import itertools
 import math
 import operator
 
+from . import util
 from . import tracks
 
 def _exp_iterator(n0, l, count):
@@ -9,12 +10,7 @@ def _exp_iterator(n0, l, count):
     Iterate over exponential function n0 * e**(l * x) where x goes from 0 to count.
     If count is None, iterates to infinity.
     """
-    if count is None:
-        it = itertools.count()
-    else:
-        it = iter(range(count))
-
-    return (n0 * math.exp(x * l) for x in it)
+    return (n0 * math.exp(x * l) for x in util.counted_iterator())
 
 class Interpolate(tracks.BaseTrack):
     """ An envelope that go through the given points using

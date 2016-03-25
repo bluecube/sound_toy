@@ -8,6 +8,7 @@ class Mixer:
     Keeps a list of playing tracks and mixes them all together.
     Tracks can be added during playing (but not removed), each
     runs until it returns.
+    Behaves as an infinite iterator.
     """
 
     def __init__(self, samplerate):
