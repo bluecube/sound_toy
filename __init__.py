@@ -1,6 +1,7 @@
 import sys
 
 from sound_toy import (
+    alsa,
     tracks,
     oscillators,
     envelopes,

@@ -3,7 +3,7 @@
 import sound_toy
 
 s = sound_toy.oscillators.SineOscillator(
-    freq = sound_toy.music.Tone('D'),
+    freq = sound_toy.tone.Tone('D'),
     phase = sound_toy.oscillators.SineOscillator(amplitude = 4, freq = 7),
     amplitude = sound_toy.envelopes.Box(10))
 

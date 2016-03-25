@@ -5,13 +5,14 @@ import string
 
 class DrumMachine(BaseTrack):
     def __init__(self, rhythm, instruments, timings, repeat = 1):
+        raise Exception("Currently broken")
         self._rhythm = rhythm
 
         max_length = max(len(l) for l in instruments)
         self._instruments = []
 
         for instrument, timing in zip(instruments, timings):
-            
+            pass
 
         self._instruments = list(zip(instruments, timings))
         self._repeat = repeat

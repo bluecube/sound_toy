@@ -5,7 +5,7 @@ import errno
 
 from .tracks import NumpyTrack
 
-def play(track, samplerate=44100, periodsize=32, card='default'):
+def play(track, samplerate=44100, periodsize=32, device='default'):
     """
     Play a track through alsa.
     Forces samplerate of the track.
@@ -13,7 +13,7 @@ def play(track, samplerate=44100, periodsize=32, card='default'):
     pcm = alsaaudio.PCM(
         type=alsaaudio.PCM_PLAYBACK,
         mode=alsaaudio.PCM_NORMAL,
-        card=card)
+        device=device)
 
     try:
         samplerate = pcm.setrate(samplerate)
