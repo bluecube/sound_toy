@@ -9,7 +9,8 @@ from sound_toy import (
     rhythm,
     tone,
     mixer,
-    drum_machine)
+    drum_machine,
+    waveform_plot)
 
 try:
     from sound_toy import alsa
