@@ -42,9 +42,13 @@ class Oscillator(BaseTrack):
             self._amplitudeLow = amplitudeLow
             self.add_slave(amplitudeLow)
             self.add_slave(amplitudeHigh)
+
+            if self._amplitude != 1:
+               raise Exception("If amplitudeLow and amplitudeHigh are set,"
+                               "amplitude must not be set.")
         else:
-           raise Exception("Both amplitudeLow and amplitudeHigh" +
-            "must be either None or not None")
+            raise Exception("Both amplitudeLow and amplitudeHigh" +
+                            "must be either None or not None")
 
     def _func(self, x):
         """
@@ -169,6 +173,24 @@ class Oscillator(BaseTrack):
         else:
             return min((slave.len(samplerate) for slave in self._slaves if slave is not None))
 
+    def _str_repr(self, fun):
+        ret = self.__class__.__name__ + "(freq=" + fun(self._freq)
+
+        if self._amplitude is not None and self._amplitude != 1:
+            ret += ", amplitude=" + fun(self._amplitude)
+        if self._amplitudeLow is not None:
+            ret += ", amplitudeLow=" + fun(self._amplitudeLow)
+        if self._amplitudeHigh is not None:
+            ret += ", amplitudeHigh=" + fun(self._amplitudeHigh)
+        if self._phase != 0:
+            ret += ", phase=" + fun(self._phase)
+        return ret
+
+    def __str__(self):
+        return self._str_repr(str)
+
+    def __repr__(self):
+        return self._str_repr(repr)
 
 class SineOscillator(Oscillator):
     _func = math.sin
