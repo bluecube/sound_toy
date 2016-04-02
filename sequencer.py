@@ -3,7 +3,7 @@ from .tracks import BaseTrack
 from .mixer import Mixer
 import string
 
-class DrumMachine(BaseTrack):
+class Sequencer(BaseTrack):
     def __init__(self, rhythm, instruments, timings, repeat = 1):
         raise Exception("Currently broken")
         self._rhythm = rhythm

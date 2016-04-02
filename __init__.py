@@ -9,7 +9,7 @@ from sound_toy import (
     rhythm,
     tone,
     mixer,
-    drum_machine,
+    sequencer,
     waveform_plot)
 
 try:

@@ -20,7 +20,7 @@ def tones_iter():
         yield tone_gen(scale[i], True)
 
 rhythm = sound_toy.rhythm.Rhythm(4, 240)
-dm = sound_toy.drum_machine.DrumMachine(rhythm, tones_iter(), [
+dm = sound_toy.sequencer.Sequencer(rhythm, tones_iter(), [
     "X  XX",
     "  X  X X X",
     " X   "],
