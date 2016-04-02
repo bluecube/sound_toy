@@ -8,7 +8,7 @@ class BaseTrack(object):
     A track represents any that can be sampled -- sound, frequency, volume, ...
     """
     def __init__(self, *slaves):
-        self._slaves = list(slaves)
+        self._slaves = list(slaves) # TODO: This is not necessary
 
         self.name = self.__class__.__name__
 

@@ -14,12 +14,11 @@ dm = sound_toy.sequencer.Sequencer(rhythm,
                                     "  X",
                                     "   X",
                                     "    X",
-                                    "     X"
                                     ],
-                                   repeat=None)
+                                   repeat=1)
 
 
 sound_toy.alsa.play(dm)
-#sound_toy.waveform_plot.plot(dm)
+sound_toy.waveform_plot.plot(dm)
 #sound_toy.wav_file.save(s, "/tmp/sine.wav")
 

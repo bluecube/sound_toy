@@ -15,6 +15,8 @@ class Sequencer(BaseTrack):
 
         self._repeat = repeat
 
+        super().__init__()
+
     def as_iter(self, samplerate):
         mixer = Mixer(samplerate)
 
