@@ -10,7 +10,8 @@ from sound_toy import (
     tone,
     mixer,
     sequencer,
-    waveform_plot)
+    waveform_plot,
+    instruments)
 
 try:
     from sound_toy import alsa
